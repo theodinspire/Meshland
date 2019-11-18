@@ -18,53 +18,53 @@ public class Torus : MonoBehaviour
 
     private void Awake()
     {
-        this.mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = this.mesh;
+        mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
 
-        this.mesh.name = "Torus";
-        this.SetVertices();
-        this.SetTriangles();
+        mesh.name = "Torus";
+        SetVertices();
+        SetTriangles();
     }
 
     // Map torus
     private Vector3 GetPointOnTorus(float u, float v)
     {
-        var radius = this.curveRadius + this.torusRadius * Mathf.Cos(v);
+        var radius = curveRadius + torusRadius * Mathf.Cos(v);
 
         return new Vector3
         {
             x = radius * Mathf.Sin(u),
             y = radius * Mathf.Cos(u),
-            z = this.torusRadius * Mathf.Sin(v)
+            z = torusRadius * Mathf.Sin(v)
         };
     }
     
     // Draw torus
     private void OnDrawGizmos()
     {
-        var uStep = 2 * Mathf.PI / this.curveSegmentCount;
-        var vStep = 2 * Mathf.PI / this.torusSegmentCount;
+        var uStep = 2 * Mathf.PI / curveSegmentCount;
+        var vStep = 2 * Mathf.PI / torusSegmentCount;
 
-        for (var u = 0; u < this.curveSegmentCount; ++u)
-        for (var v = 0; v < this.torusSegmentCount; ++v)
+        for (var u = 0; u < curveSegmentCount; ++u)
+        for (var v = 0; v < torusSegmentCount; ++v)
         {
             var point = GetPointOnTorus(u * uStep, v * vStep);
-            Gizmos.color = new Color(1, (float) v / this.torusSegmentCount, (float) u / this.curveSegmentCount);
+            Gizmos.color = new Color(1, (float) v / torusSegmentCount, (float) u / curveSegmentCount);
             Gizmos.DrawSphere(point, 0.1f);
         }
     }
 
     private void SetVertices()
     {
-        this.vertices = new Vector3[this.torusSegmentCount * this.curveSegmentCount * 4];
+        vertices = new Vector3[torusSegmentCount * curveSegmentCount * 4];
 
         var step = 2f * Mathf.PI / curveSegmentCount;
         
         CreateFirstQuadRing(step);
 
-        var delta = this.torusSegmentCount * 4;
+        var delta = torusSegmentCount * 4;
 
-        for (int u = 2, i = delta; u <= this.curveSegmentCount; ++u, i += delta)
+        for (int u = 2, i = delta; u <= curveSegmentCount; ++u, i += delta)
         {
             CreateQuadRing(u * step, i);
         }
@@ -74,12 +74,13 @@ public class Torus : MonoBehaviour
 
     private void SetTriangles()
     {
-        triangles = new int[torusSegmentCount * curveSegmentCount * 6];
+        var triangleCount = torusSegmentCount * curveSegmentCount * 6;
+        triangles = new int[triangleCount];
 
-        for (int t = 0, i = 0; t < triangles.Length; t += 6, i += 4)
+        for (int t = 0, i = 0; t < triangleCount; t += 6, i += 4)
         {
             triangles[t] = i;
-            triangles[i + 1] = triangles[t + 4] = i + 1;
+            triangles[t + 1] = triangles[t + 4] = i + 1;
             triangles[t + 2] = triangles[t + 3] = i + 2;
             triangles[t + 5] = i + 3;
         }
@@ -89,12 +90,12 @@ public class Torus : MonoBehaviour
 
     private void CreateFirstQuadRing(float u)
     {
-        var step = 2 * Mathf.PI / this.torusSegmentCount;
+        var step = 2 * Mathf.PI / torusSegmentCount;
 
-        var a = this.GetPointOnTorus(0, 0);
-        var b = this.GetPointOnTorus(u, 0);
+        var a = GetPointOnTorus(0, 0);
+        var b = GetPointOnTorus(u, 0);
 
-        for (int v = 1, i = 0; v <= this.torusSegmentCount; ++v, i += 4)
+        for (int v = 1, i = 0; v <= torusSegmentCount; ++v, i += 4)
         {
             vertices[i] = a;
             vertices[i + 2] = b;
@@ -109,12 +110,12 @@ public class Torus : MonoBehaviour
 
     private void CreateQuadRing(float u, int i)
     {
-        var step = 2 * Mathf.PI / this.torusSegmentCount;
-        var offset = this.torusSegmentCount * 4;
+        var step = 2 * Mathf.PI / torusSegmentCount;
+        var offset = torusSegmentCount * 4;
 
-        var vertex = this.GetPointOnTorus(u, 0);
+        var vertex = GetPointOnTorus(u, 0);
 
-        for (var v = 1; v <= this.torusSegmentCount; ++v, i += 4)
+        for (var v = 1; v <= torusSegmentCount; ++v, i += 4)
         {
             vertices[i] = vertices[i - offset + 2];
             vertices[i + 1] = vertices[i - offset + 3];
